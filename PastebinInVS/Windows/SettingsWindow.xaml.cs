@@ -22,6 +22,8 @@ namespace PastebinInVS.Windows
             Settings.Default.PasteLanguage = PasteLanguage.Text;
             Settings.Default.PastePrivate = int.Parse(PastePrivate.Text);
 
+            Settings.Default.Save();
+
             this.Close();
         }
 

@@ -56,11 +56,17 @@
     <Compile Include="Structs\TextViewSelection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PastebinInVSPackage.cs" />
+    <Compile Include="Windows\LoadCodeWindow.xaml.cs">
+      <DependentUpon>LoadCodeWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\SettingsWindow.xaml.cs">
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\.editorconfig">
+      <Link>.editorconfig</Link>
+    </None>
     <None Include="app.config" />
     <None Include="Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -103,6 +109,10 @@
     <Content Include="Commands\Resources\OpenSettings.png" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Windows\LoadCodeWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Windows\SettingsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

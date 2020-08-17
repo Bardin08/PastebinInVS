@@ -5,64 +5,56 @@
   <Extern href="vsshlids.h" />
 
   <Commands package="guidPastebinInVSPackage">
+    <Menus>
+      <Menu guid="OpenSettingsCommand" id="PastebinExtensionMenu" priority="0x700" type="Menu">
+        <Parent guid="guidSHLMainMenu"
+                  id="IDG_VS_MM_TOOLSADDINS" />
+        <Strings>
+          <ButtonText>PastebinInVS</ButtonText>
+        </Strings>  
+      </Menu>
+    </Menus>
+    
     <Groups>
-      <Group guid="guidPastebinInVSPackageCmdSet" id="MyMenuGroup" priority="0x0600">
+      <Group guid="LoadCodeCommand" id="ExtensionContextMenu" priority="0x0600">
         <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_CODEWIN" />
       </Group>
-      <Group guid="guidPastebinInVSPackageCmdSet1" id="MyMenuGroup" priority="0x0600">
-        <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_CODEWIN" />
+      
+      <Group guid="OpenSettingsCommand" id="ExtensionMenu" priority="0x0600">
+        <Parent guid="OpenSettingsCommand" id="PastebinExtensionMenu" />
       </Group>
     </Groups>
 
     <Buttons>
-      <Button guid="guidPastebinInVSPackageCmdSet" id="LoadCodeToPastebinId" priority="0x0100" type="Button">
-        <Parent guid="guidPastebinInVSPackageCmdSet" id="MyMenuGroup" />
+      <Button guid="LoadCodeCommand" id="LoadCodeToPastebinId" priority="0x0100" type="Button">
+        <Parent guid="LoadCodeCommand" id="ExtensionContextMenu" />
         <Strings>
           <ButtonText>Load Code To Pastebin</ButtonText>
         </Strings>
       </Button>
-      <Button guid="guidPastebinInVSPackageCmdSet1" id="cmdidOpenSettings" priority="0x0100" type="Button">
-        <Parent guid="guidPastebinInVSPackageCmdSet" id="MyMenuGroup" />
+
+      <Button guid="OpenSettingsCommand" id="cmdidOpenSettings" priority="0x0100" type="Button">
+        <Parent guid="OpenSettingsCommand" id="ExtensionMenu" />
         <Strings>
           <ButtonText>PastebinInVS Settings</ButtonText>
         </Strings>
       </Button>
     </Buttons>
-
-    <Bitmaps>
-      <Bitmap guid="guidImages1" href="Commands\Resources\OpenSettings.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
-    </Bitmaps>
   </Commands>
 
   <Symbols>
     <GuidSymbol name="guidPastebinInVSPackage" value="{2cded8dd-7092-49cd-b805-eb8e94491531}" />
 
-    <GuidSymbol name="guidPastebinInVSPackageCmdSet" value="{f9aa38ea-6f22-4bff-bf61-9e552eb7a537}">
-      <IDSymbol name="MyMenuGroup" value="0x1020" />
+    <GuidSymbol name="LoadCodeCommand" value="{f9aa38ea-6f22-4bff-bf61-9e552eb7a537}">
+      <IDSymbol name="ExtensionContextMenu" value="0x1020" />
       <IDSymbol name="LoadCodeToPastebinId" value="0x0100" />
     </GuidSymbol>
-
-    <GuidSymbol name="guidImages" value="{e13adf29-16d1-4543-bdac-c5e1dc004342}">
-      <IDSymbol name="bmpPic1" value="1" />
-      <IDSymbol name="bmpPic2" value="2" />
-      <IDSymbol name="bmpPicSearch" value="3" />
-      <IDSymbol name="bmpPicX" value="4" />
-      <IDSymbol name="bmpPicArrows" value="5" />
-      <IDSymbol name="bmpPicStrikethrough" value="6" />
-    </GuidSymbol>
   
-    <GuidSymbol value="{405ae880-b5dd-40f0-8152-706617c5d5ba}" name="guidPastebinInVSPackageCmdSet1">
-      <IDSymbol value="4128" name="MyMenuGroup" />
+    <GuidSymbol value="{405ae880-b5dd-40f0-8152-706617c5d5ba}" name="OpenSettingsCommand">
+      <IDSymbol value="4128" name="ExtensionMenu" />
       <IDSymbol value="256" name="cmdidOpenSettings" />
+      <IDSymbol name="PastebinExtensionMenu" value="0x1021" />
     </GuidSymbol>
   
-    <GuidSymbol value="{c6317f52-a24c-4b17-91dc-49f3a3747922}" name="guidImages1">
-      <IDSymbol name="bmpPic1" value="1" />
-      <IDSymbol name="bmpPic2" value="2" />
-      <IDSymbol name="bmpPicSearch" value="3" />
-      <IDSymbol name="bmpPicX" value="4" />
-      <IDSymbol name="bmpPicArrows" value="5" />
-      <IDSymbol name="bmpPicStrikethrough" value="6" />
-    </GuidSymbol>
   </Symbols>
 </CommandTable>

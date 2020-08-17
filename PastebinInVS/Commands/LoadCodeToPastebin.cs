@@ -111,7 +111,8 @@ namespace PastebinInVS.Commands
             var name = GetActiveFileNameAsync(ServiceProvider).Result;
             var code = GetSelectionAsync(ServiceProvider).Result.Text;
 
-            _ = PastebinPasteRequestAsync(name, code);
+            var codeLoadWindow = new Windows.LoadCodeWindow(name, code);
+            codeLoadWindow.Show();
         }
 
         /// <summary>
@@ -125,40 +126,6 @@ namespace PastebinInVS.Commands
             return applicationObject.ActiveDocument.Name;
         }
 
-        /// <summary>
-        /// Paste selected code to pastebin.com
-        /// </summary>
-        /// <param name="name">Paste name</param>
-        /// <param name="code">Paste code</param>
-        private async Task PastebinPasteRequestAsync(string name, string code)
-        {
-            var baseAddress = new Uri("https://pastebin.com/api/api_post.php");
-            var cookieContainer = new CookieContainer();
-            using (var handler = new HttpClientHandler() { CookieContainer = cookieContainer })
-            using (var client = new HttpClient(handler) { BaseAddress = baseAddress })
-            {
-                var content = new FormUrlEncodedContent(new[]
-                {
-                    new KeyValuePair<string, string>("api_option", "paste"),
-                    new KeyValuePair<string, string>("api_user_key", Settings.Default.UserApiKey),
-                    new KeyValuePair<string, string>("api_paste_private", Settings.Default.PastePrivate.ToString()),
-                    new KeyValuePair<string, string>("api_paste_name", name),
-                    new KeyValuePair<string, string>("api_paste_expire_date", Settings.Default.PasteExpireTime),
-                    new KeyValuePair<string, string>("api_paste_format", Settings.Default.PasteLanguage),
-                    new KeyValuePair<string, string>("api_dev_key", Settings.Default.DeveloperApiKey),
-                    new KeyValuePair<string, string>("api_paste_code", code)
-                });
-
-                cookieContainer.Add(baseAddress, new Cookie("CookieName", "cookie_value"));
-                var result = await client.PostAsync(baseAddress, content);
-                Console.WriteLine(result.IsSuccessStatusCode);
-                Console.WriteLine(result.EnsureSuccessStatusCode().Content.ReadAsStringAsync().Result);
-                if (result.IsSuccessStatusCode)
-                {
-                    new TextCopy.Clipboard().SetText(result.EnsureSuccessStatusCode().Content.ReadAsStringAsync().Result);
-                }
-            }
-        }
 
         /// <summary>
         /// Get selected text
@@ -172,7 +139,7 @@ namespace PastebinInVS.Commands
             IVsTextView view;
             _ = textManager.GetActiveView2(1, null, (uint)_VIEWFRAMETYPE.vftCodeWindow, out view);
 
-            view.GetSelection(out int startLine, out int startColumn, out int endLine, out int endColumn);//end could be before beginning
+            view.GetSelection(out int startLine, out int startColumn, out int endLine, out int endColumn);
             var start = new TextViewPosition(startLine, startColumn);
             var end = new TextViewPosition(endLine, endColumn);
 
