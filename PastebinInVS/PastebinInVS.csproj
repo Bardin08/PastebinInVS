@@ -46,8 +46,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Commands\LoadCodeToPastebin.cs" />
-    <Compile Include="Commands\TextViewPosition.cs" />
-    <Compile Include="Commands\TextViewSelection.cs" />
+    <Compile Include="Structs\TextViewPosition.cs" />
+    <Compile Include="Structs\TextViewSelection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PastebinInVSPackage.cs" />
   </ItemGroup>
@@ -63,6 +63,7 @@
     <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>

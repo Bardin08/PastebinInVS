@@ -1,19 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
-using System.Globalization;
 using System.Net;
 using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
 
 using EnvDTE;
 
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TextManager.Interop;
 
 using Task = System.Threading.Tasks.Task;
+
+using PastebinInVS.Structs;
 
 namespace PastebinInVS.Commands
 {
@@ -79,11 +78,10 @@ namespace PastebinInVS.Commands
         /// <param name="package">Owner package, not null.</param>
         public static async Task InitializeAsync(AsyncPackage package)
         {
-            // Switch to the main thread - the call to AddCommand in LoadCodeToPastebin's constructor requires
-            // the UI thread.
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(package.DisposalToken);
 
-            OleMenuCommandService commandService = await package.GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService;
+            OleMenuCommandService commandService = await package.GetServiceAsync(typeof(IMenuCommandService))
+                .ConfigureAwait(false) as OleMenuCommandService;
             Instance = new LoadCodeToPastebin(package, commandService);
         }
 
@@ -96,18 +94,29 @@ namespace PastebinInVS.Commands
         /// <param name="e">Event args.</param>
         private void Execute(object sender, EventArgs e)
         {
-            var name = GetActiveFileName(ServiceProvider).Result;
+            var name = GetActiveFileNameAsync(ServiceProvider).Result;
             var code = GetSelectionAsync(ServiceProvider).Result.Text;
 
-            PastebinPasteRequest(name, code);
+            _ = PastebinPasteRequestAsync(name, code);
         }
 
-        private async Task<string> GetActiveFileName(Microsoft.VisualStudio.Shell.IAsyncServiceProvider serviceProvider)
+        /// <summary>
+        /// Get open file name
+        /// </summary>
+        /// <param name="serviceProvider">Service provider</param>
+        /// <returns>Active file name</returns>
+        private async Task<string> GetActiveFileNameAsync(Microsoft.VisualStudio.Shell.IAsyncServiceProvider serviceProvider)
         {
             EnvDTE80.DTE2 applicationObject = await serviceProvider.GetServiceAsync(typeof(DTE)).ConfigureAwait(false) as EnvDTE80.DTE2;
             return applicationObject.ActiveDocument.Name;
         }
-        private async Task PastebinPasteRequest(string name, string code)
+
+        /// <summary>
+        /// Paste selected code to pastebin.com
+        /// </summary>
+        /// <param name="name">Paste name</param>
+        /// <param name="code">Paste code</param>
+        private async Task PastebinPasteRequestAsync(string name, string code)
         {
             var baseAddress = new Uri("https://pastebin.com/api/api_post.php");
             var cookieContainer = new CookieContainer();
@@ -136,12 +145,18 @@ namespace PastebinInVS.Commands
                 }
             }
         }
+
+        /// <summary>
+        /// Get selected text
+        /// </summary>
+        /// <param name="serviceProvider">Service provider</param>
+        /// <returns>Selected text</returns>
         private async Task<TextViewSelection> GetSelectionAsync(Microsoft.VisualStudio.Shell.IAsyncServiceProvider serviceProvider)
         {
             var service = await serviceProvider.GetServiceAsync(typeof(SVsTextManager)).ConfigureAwait(false);
             var textManager = service as IVsTextManager2;
             IVsTextView view;
-            int result = textManager.GetActiveView2(1, null, (uint)_VIEWFRAMETYPE.vftCodeWindow, out view);
+            _ = textManager.GetActiveView2(1, null, (uint)_VIEWFRAMETYPE.vftCodeWindow, out view);
 
             view.GetSelection(out int startLine, out int startColumn, out int endLine, out int endColumn);//end could be before beginning
             var start = new TextViewPosition(startLine, startColumn);
@@ -151,6 +166,5 @@ namespace PastebinInVS.Commands
 
             return new TextViewSelection(start, end, selectedText);
         }
-
     }
 }
