@@ -13,6 +13,7 @@ using Microsoft.VisualStudio.TextManager.Interop;
 using Task = System.Threading.Tasks.Task;
 
 using PastebinInVS.Structs;
+using Microsoft.VisualStudio.Shell.Interop;
 
 namespace PastebinInVS.Commands
 {
@@ -94,6 +95,19 @@ namespace PastebinInVS.Commands
         /// <param name="e">Event args.</param>
         private void Execute(object sender, EventArgs e)
         {
+            if (string.IsNullOrEmpty(Settings.Default.DeveloperApiKey) || string.IsNullOrWhiteSpace(Settings.Default.DeveloperApiKey))
+            {
+                VsShellUtilities.ShowMessageBox(
+                package,
+                "Incorrect developer api key. You can change it in a settings.",
+                "Error",
+                OLEMSGICON.OLEMSGICON_CRITICAL,
+                OLEMSGBUTTON.OLEMSGBUTTON_OK,
+                OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+
+                return;
+            }
+
             var name = GetActiveFileNameAsync(ServiceProvider).Result;
             var code = GetSelectionAsync(ServiceProvider).Result.Text;
 
@@ -126,12 +140,12 @@ namespace PastebinInVS.Commands
                 var content = new FormUrlEncodedContent(new[]
                 {
                     new KeyValuePair<string, string>("api_option", "paste"),
-                    new KeyValuePair<string, string>("api_user_key", ""),
-                    new KeyValuePair<string, string>("api_paste_private", "1"),
+                    new KeyValuePair<string, string>("api_user_key", Settings.Default.UserApiKey),
+                    new KeyValuePair<string, string>("api_paste_private", Settings.Default.PastePrivate.ToString()),
                     new KeyValuePair<string, string>("api_paste_name", name),
-                    new KeyValuePair<string, string>("api_paste_expire_date", "10M"),
-                    new KeyValuePair<string, string>("api_paste_format", "csharp"),
-                    new KeyValuePair<string, string>("api_dev_key", "N1MiniBb9KfKrTp0rygAvTQyow6Rz7Nn"),
+                    new KeyValuePair<string, string>("api_paste_expire_date", Settings.Default.PasteExpireTime),
+                    new KeyValuePair<string, string>("api_paste_format", Settings.Default.PasteLanguage),
+                    new KeyValuePair<string, string>("api_dev_key", Settings.Default.DeveloperApiKey),
                     new KeyValuePair<string, string>("api_paste_code", code)
                 });
 

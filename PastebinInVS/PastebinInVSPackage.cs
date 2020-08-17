@@ -50,6 +50,7 @@ namespace PastebinInVS
             // Do any initialization that requires the UI thread after switching to the UI thread.
             await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
             await Commands.LoadCodeToPastebin.InitializeAsync(this);
+            await PastebinInVS.Commands.OpenSettings.InitializeAsync(this);
         }
 
         #endregion
