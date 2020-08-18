@@ -1,9 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
 using System.Windows;
+
+using Microsoft.VisualStudio.Shell.Interop;
+
+using PastebinApiWrapper;
+using PastebinApiWrapper.Models;
+using PastebinApiWrapper.Models.Enums;
 
 namespace PastebinInVS.Windows
 {
@@ -54,50 +56,19 @@ namespace PastebinInVS.Windows
 
         private void SendCodeBtn_Click(object sender, RoutedEventArgs e)
         {
-            _ = PastebinPasteRequestAsync(
-                    Settings.Default.DeveloperApiKey,
-                    PastePrivateTextBox.Text,
-                    PasteNameTextBox.Text,
-                    PasteExpireTextBox.Text,
-                    PasteLanguageTextBox.Text,
-                    CodeTextBox.Text);
-        }
+            var pastebin = new Pastebin(Settings.Default.DeveloperApiKey);
 
-        /// <summary>
-        /// Paste selected code to pastebin.com
-        /// </summary>
-        /// <param name="name">Paste name</param>
-        /// <param name="code">Paste code</param>
-        private async Task PastebinPasteRequestAsync(string devKey, string pastePrivate, string pasteName, string pasteExpireDate, string pasteLanguage, string pasteCode, string userKey = "")
-        {
-            var baseAddress = new Uri("https://pastebin.com/api/api_post.php");
-            var cookieContainer = new CookieContainer();
-            using (var handler = new HttpClientHandler() { CookieContainer = cookieContainer })
-            using (var client = new HttpClient(handler) { BaseAddress = baseAddress })
-            {
-                var content = new FormUrlEncodedContent(new[]
+            var r = pastebin.CreateNewPasteAsync(
+                new PasteInfo
                 {
-                    new KeyValuePair<string, string>("api_option", "paste"),
-                    new KeyValuePair<string, string>("api_user_key", userKey),
-                    new KeyValuePair<string, string>("api_paste_private", pastePrivate),
-                    new KeyValuePair<string, string>("api_paste_name", pasteName),
-                    new KeyValuePair<string, string>("api_paste_expire_date", pasteExpireDate),
-                    new KeyValuePair<string, string>("api_paste_format", pasteLanguage),
-                    new KeyValuePair<string, string>("api_dev_key", devKey),
-                    new KeyValuePair<string, string>("api_paste_code", pasteCode)
-                });
+                    Name = PasteName,
+                    Code = PasteCode,
+                    ExpireDate = PasteExpireDate.TenMinutes,
+                    Language = PasteLanguage.csharp,
+                    Private = PastePrivate.Public
+                }).Result;
 
-                cookieContainer.Add(baseAddress, new Cookie("CookieName", "cookie_value"));
-                var result = await client.PostAsync(baseAddress, content).ConfigureAwait(false);
-
-                if (result.IsSuccessStatusCode)
-                {
-                    var clipboard = new TextCopy.Clipboard();
-                    clipboard.SetText(await result.EnsureSuccessStatusCode().Content.ReadAsStringAsync().ConfigureAwait(false));
-
-                    MessageBox.Show(await clipboard.GetTextAsync().ConfigureAwait(false), "Request result");
-                }
-            }
+            new TextCopy.Clipboard().SetText(r.Link);  // copy link to system clipbaord 
         }
     }
 }

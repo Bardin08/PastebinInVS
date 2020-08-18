@@ -1,7 +1,5 @@
 ﻿using System.Windows;
 
-using MahApps.Metro.Controls;
-
 namespace PastebinInVS.Windows
 {
     /// <summary>
@@ -23,6 +21,7 @@ namespace PastebinInVS.Windows
             Settings.Default.PastePrivate = int.Parse(PastePrivate.Text);
 
             Settings.Default.Save();
+            Settings.Default.Reload();
 
             this.Close();
         }
