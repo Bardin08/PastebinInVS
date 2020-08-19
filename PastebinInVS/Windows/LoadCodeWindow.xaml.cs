@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Windows;
 
-using Microsoft.VisualStudio.Shell.Interop;
-
 using PastebinApiWrapper;
 using PastebinApiWrapper.Models;
 using PastebinApiWrapper.Models.Enums;
@@ -58,7 +56,7 @@ namespace PastebinInVS.Windows
         {
             var pastebin = new Pastebin(Settings.Default.DeveloperApiKey);
 
-            var r = pastebin.CreateNewPasteAsync(
+            var r = pastebin.CreateNewPasteAsGuestAsync(
                 new PasteInfo
                 {
                     Name = PasteName,
@@ -69,6 +67,7 @@ namespace PastebinInVS.Windows
                 }).Result;
 
             new TextCopy.Clipboard().SetText(r.Link);  // copy link to system clipbaord 
+            this.Close();
         }
     }
 }
